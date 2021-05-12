@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
+from rest_framework.authtoken.models import Token
 
 # Create your views here.
 
@@ -12,10 +13,18 @@ def logout(request):
     return HttpResponseRedirect(reverse('index'))
 
 def index(request):
+    if request.user.is_authenticated:
+        token = Token.objects.get(user=User.objects.get(username=request.user.username))
+        print(token.key)
     return render(request, 'mainsite/index.html') 
 
+@login_required
+def dashboard(request):
+    return render(request, "mainsite/dashboard.html", {
+        "token": Token.objects.get(user=User.objects.get(username=request.user.username)).key
+    })
 
-def login(request):
+def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -23,6 +32,7 @@ def login(request):
         
         if user is not None:
             login(request, user)
+            return HttpResponseRedirect(reverse('index'))
         else:
             return render(request, 'mainsite/login.html', {
                 "message": "Invalid username and/or password"
@@ -50,6 +60,7 @@ def register(request):
                 "message": "Username already taken."
             })
         login(request, user)
+        Token.objects.get_or_create(user=user)
         return HttpResponseRedirect(reverse("index"))
     else:
-        return render(request, 'mainsite/login.html')
+        return render(request, 'mainsite/register.html')
