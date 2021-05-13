@@ -3,6 +3,75 @@
 {% block body %}
 
 <h1>Dashboard</h1>
-<h4>Token: {{ token }}</h4>
+{% comment %} <h4>Token: {{ token }}</h4> {% endcomment %}
 
+<div class="articles" id='articles-dashboard'></div>
+
+<script>
+fetch('{% url 'api:news' %}?q={{ query }}', {
+    method: 'get',
+    headers: {
+        'Authorization': 'Token {{ token }}'
+    }
+})
+.then(request => request.json())
+.then(data => {
+    console.log(data)
+    short_data = data['articles'].slice(0, 10)
+
+    short_data.forEach(article => {
+        let cardContainer = document.createElement('div')
+        cardContainer.className = 'card'
+        cardContainer.style.width = '15vw'
+
+        let image = document.createElement('img')
+        image.src = article['urlToImage']
+        image.class = 'card-img-top'
+        image.style.width = '100%'
+        image.style.height = '15vw'
+
+        let cardBody = document.createElement('div')
+        cardBody.className = 'card-body'
+
+        let cardTitle = document.createElement('h5')
+        cardTitle.className = 'card-title'
+        cardTitle.innerHTML = article['title']
+
+        let cardDescription = document.createElement('p')
+        cardDescription.className = 'card-text'
+        cardDescription.innerHTML = article['articlePreview']
+
+        let date = new Date( Date.parse(article['timePublished']) )
+        let formattedDate = date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+
+        let cardDate = document.createElement('p')
+        cardDate.className = 'card-text'
+        cardDate.style.color = 'grey'
+        cardDate.innerHTML = formattedDate
+
+        let cardPublisher = document.createElement('p')
+        cardPublisher.className = 'card-text'
+        cardPublisher.style.color = 'grey'
+        cardPublisher.innerHTML = `Published by ${article['source']}`
+
+        let cardButton = document.createElement('a')
+        cardButton.className = 'btn btn-primary'
+        cardButton.href = article['url']
+        cardButton.innerHTML = 'Go to article'
+
+        let container = document.querySelector('#articles-dashboard')
+        
+        cardBody.appendChild(cardTitle)
+        cardBody.appendChild(cardDescription)
+        cardBody.appendChild(cardDate)
+        cardBody.appendChild(cardPublisher)
+        cardBody.appendChild(cardButton)
+        cardContainer.appendChild(image)
+        cardContainer.appendChild(cardBody)
+
+        container.append(cardContainer)
+
+    })
+})
+</script>
 {% endblock %}

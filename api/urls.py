@@ -7,3 +7,5 @@ urlpatterns = [
     path('news', views.News.as_view(), name="news"),
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
 ]
+
+app_name = 'api'

@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from rest_framework.authtoken.models import Token
+import random
 
 # Create your views here.
 
@@ -20,8 +21,29 @@ def index(request):
 
 @login_required
 def dashboard(request):
+    exampleQueries = ['coronavirus',
+                    'cnn',
+                    'fox news',
+                    'zoo',
+                    'iphone',
+                    'android',
+                    'forbes',
+                    'entertainment',
+                    'england',
+                    'technology',
+                    'bbc',
+                    'google',
+                    'amazon',
+                    'wall street',
+                    'latin america',
+                    'australia',
+                    'science',
+                    'physics',
+                    'chemistry',
+                    'dow jones']
     return render(request, "mainsite/dashboard.html", {
-        "token": Token.objects.get(user=User.objects.get(username=request.user.username)).key
+        "token": Token.objects.get(user=User.objects.get(username=request.user.username)).key,
+        "query": random.choice(exampleQueries),
     })
 
 def login_view(request):

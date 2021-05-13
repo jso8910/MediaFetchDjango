@@ -72,7 +72,7 @@ def newsSearch(query, timeRange='', excluding='', requiring=''):
                 "title": title_elem.text,
                 "articlePreview": article_snippet.text,
                 "url": url,
-                "urlToImage": image_url['src'],
+                "urlToImage": image_url['src'].replace('-h100-w100', ''),
                 "timePublished": "Not found"})
         else:
             data['articles'].append({
@@ -80,7 +80,7 @@ def newsSearch(query, timeRange='', excluding='', requiring=''):
                 "title": title_elem.text,
                 "articlePreview": article_snippet.text,
                 "url": url,
-                "urlToImage": image_url['src'],
+                "urlToImage": image_url['src'].replace('-h100-w100', ''),
                 "timePublished": time['datetime']})
 
     data['status'] = 'success'

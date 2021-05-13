@@ -1,3 +1,25 @@
 .content {
     padding: 10px;
 }
+
+.articles {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.card {
+    margin: 10px;
+    flex-grow: 0;
+    width: 30vw;
+}
+
+.card-img-top {
+    max-height: 100px;
+    max-width: 100px;
+    object-fit: cover;
+    /* object-fit:contain; */
+}
+
+/* .articles>* {
+    flex: 1 1 160px;
+} */
