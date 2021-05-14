@@ -1,0 +1,190 @@
+{% extends 'exampleapp/layout.html' %}
+
+{% block body %}
+<script>
+function del(id) {
+    fetch(`{% url "delete_category" %}?id=${id}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error)
+        } else {
+            document.querySelector(`#category_${id}`).remove()
+        }
+    })
+    return false
+}
+</script>
+
+<form class="form-inline my-2 my-lg-0" id="new-category">
+    <input id="category" class="form-control mr-sm-2" name='category' type="text" placeholder="New category">
+    <button id="category-btn" class="btn btn-outline-success my-2 my-sm-0" type="submit">Add</button>
+</form>
+
+<div class="categories">
+    {% for category in categories %}
+    <div id="category_{{ category.id }}" style='background: lightgrey'>
+        <h5>{{ category.category }}</h5>
+        <button id="delete_{{ category.id }}" onclick="del({{ category.id }})" class='btn btn-primary'>Delete</button>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="articles" id="home-articles"></div>
+
+<script>
+
+category = document.querySelector('#category')
+button = document.querySelector('#category-btn')
+
+category.onkeyup = () => {
+    if (category.value.trim().length > 0) {
+        button.disabled = false
+    } else {
+        button.disabled = true
+    }
+}
+
+
+document.querySelector('#new-category').onsubmit = () => {
+    console.log('ok')
+    fetch(`{% url "add_category" %}?category=${category.value}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error)
+        } else {
+            ndiv = document.createElement('div')
+            ndiv.id = `category_${data.id}`
+            ndiv.style.backgroundColor = 'lightgrey'
+            nh5 = document.createElement('h5')
+            nh5.innerHTML = category.value
+            nbtn = document.createElement('button')
+            nbtn.id = `delete_${data.id}`
+            nbtn.className = 'btn btn-primary'
+            nbtn.innerHTML = 'Delete'
+            ndiv.appendChild(nh5)
+            ndiv.appendChild(nbtn)
+            document.querySelector('.categories').appendChild(ndiv)
+        }
+    })
+    return false
+}
+
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
+async function getStuff() {
+let articles = Array()
+
+let urlN;
+{% for category in categories %}
+
+urlN = '{% url "api:news" %}?q={{ category.category }}'
+
+await fetch(urlN, {
+    method: 'get',
+    headers: {
+        'Authorization': 'Token {{ token }}',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+})
+.then(request => request.json())
+.then(data => {
+    articles = articles.concat(data.articles.map(x => {
+        x.category = "{{ category.category }}"
+        return x
+    }))
+})
+
+{% endfor %}
+return articles
+}
+async function populate() {
+articles = await getStuff()
+articles = Array.from(articles)
+articles = shuffle(articles)
+
+articles.forEach(article => {
+    let cardContainer = document.createElement('div')
+    cardContainer.className = 'card'
+    cardContainer.style.width = '15vw'
+
+    let image = document.createElement('img')
+    image.src = article['urlToImage']
+    image.class = 'card-img-top'
+    image.style.minHeight = '200px'
+    image.style.height = '100%'
+    image.style.minWidth = '200px'
+    image.style.width = '100%'
+
+    let cardBody = document.createElement('div')
+    cardBody.className = 'card-body'
+
+    let cardTitle = document.createElement('h5')
+    cardTitle.className = 'card-title'
+    cardTitle.innerHTML = article['title']
+
+    let cardDescription = document.createElement('p')
+    cardDescription.className = 'card-text'
+    cardDescription.innerHTML = article['articlePreview']
+
+    let date = new Date( Date.parse(article['timePublished']) )
+    let formattedDate = date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+
+    let cardDate = document.createElement('p')
+    cardDate.className = 'card-text'
+    cardDate.style.color = 'grey'
+    cardDate.innerHTML = formattedDate
+
+    let cardPublisher = document.createElement('p')
+    cardPublisher.className = 'card-text'
+    cardPublisher.style.color = 'grey'
+    cardPublisher.innerHTML = `Published by ${article['source']}`
+    
+    let cardCategory = document.createElement('p')
+    cardCategory.className = 'card-text'
+    cardCategory.style.color = 'grey'
+    cardCategory.innerHTML = `Category: ${article.category}`
+
+    let cardButton = document.createElement('a')
+    cardButton.className = 'btn btn-primary'
+    cardButton.href = article['url']
+    cardButton.innerHTML = 'Go to article'
+
+    let container = document.querySelector('#home-articles')
+    
+    cardBody.appendChild(cardTitle)
+    cardBody.appendChild(cardDescription)
+    cardBody.appendChild(cardDate)
+    cardBody.appendChild(cardPublisher)
+    cardBody.appendChild(cardCategory)
+    cardBody.appendChild(cardButton)
+    cardContainer.appendChild(image)
+    cardContainer.appendChild(cardBody)
+
+    container.append(cardContainer)
+
+})
+}
+populate()
+
+</script>
+{% endblock %}
