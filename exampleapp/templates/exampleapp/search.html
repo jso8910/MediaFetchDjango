@@ -1,0 +1,84 @@
+{% extends 'exampleapp/layout.html' %}
+
+{% block body %}
+<h2>Search results</h2>
+<div id="search-container" class='articles'></div>
+
+<script>
+let url = '{% url "api:news" %}?q={{ query }}'
+'{{ when }}' != '' ? url += `&time={{ when }}` : url += ''
+'{{ exclude }}' != '' ? url += `&exclude={{ exclude }}` : url += ''
+'{{ require }}' != '' ? url += `&require={{ require }}` : url += ''
+
+console.log(url)
+
+fetch(url, {
+    method: 'get',
+    headers: {
+        'Authorization': 'Token {{ token }}',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+})
+.then(request => request.json())
+.then(data => {
+    console.log(data)
+
+    data.articles.forEach(article => {
+        let cardContainer = document.createElement('div')
+        cardContainer.className = 'card'
+        cardContainer.style.width = '15vw'
+
+        let image = document.createElement('img')
+        image.src = article['urlToImage']
+        image.class = 'card-img-top'
+        image.style.minHeight = '200px'
+        image.style.height = '100%'
+        image.style.minWidth = '200px'
+        image.style.width = '100%'
+
+        let cardBody = document.createElement('div')
+        cardBody.className = 'card-body'
+
+        let cardTitle = document.createElement('h5')
+        cardTitle.className = 'card-title'
+        cardTitle.innerHTML = article['title']
+
+        let cardDescription = document.createElement('p')
+        cardDescription.className = 'card-text'
+        cardDescription.innerHTML = article['articlePreview']
+
+        let date = new Date( Date.parse(article['timePublished']) )
+        let formattedDate = date.toISOString().replace(/T/, ' ').replace(/\..+/, '')
+
+        let cardDate = document.createElement('p')
+        cardDate.className = 'card-text'
+        cardDate.style.color = 'grey'
+        cardDate.innerHTML = formattedDate
+
+        let cardPublisher = document.createElement('p')
+        cardPublisher.className = 'card-text'
+        cardPublisher.style.color = 'grey'
+        cardPublisher.innerHTML = `Published by ${article['source']}`
+
+        let cardButton = document.createElement('a')
+        cardButton.className = 'btn btn-primary'
+        cardButton.href = article['url']
+        cardButton.innerHTML = 'Go to article'
+
+        let container = document.querySelector('#search-container')
+        
+        cardBody.appendChild(cardTitle)
+        cardBody.appendChild(cardDescription)
+        cardBody.appendChild(cardDate)
+        cardBody.appendChild(cardPublisher)
+        cardBody.appendChild(cardButton)
+        cardContainer.appendChild(image)
+        cardContainer.appendChild(cardBody)
+
+        container.append(cardContainer)
+
+    })
+})
+</script>
+{% endblock %}

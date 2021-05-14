@@ -18,8 +18,7 @@ def logout(request):
 
 def index(request):
     if request.user.is_authenticated:
-        token = Token.objects.get(user=User.objects.get(username=request.user.username))
-        print(token.key)
+        return HttpResponseRedirect(reverse('dashboard'))
     return render(request, 'mainsite/index.html') 
 
 # NOT A VIEW

@@ -21,7 +21,8 @@ from .settings import DEBUG
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('mainsite.urls')),
-    path('api/', include("api.urls", namespace='api'))
+    path('api/', include("api.urls", namespace='api')),
+    path('exampleapp/', include('exampleapp.urls')),
 ]
 
 if DEBUG:
