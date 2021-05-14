@@ -10,5 +10,6 @@ urlpatterns = [
     path('register', views.register, name='register'),
     path('logout', views.logout, name='logout'),
     path('dashboard', views.dashboard, name='dashboard'),
-
+    path('total.svg', views.allUsersSvg, name='allsvg'),
+    path('user.svg', views.yourUserSvg, name='usersvg')
 ]

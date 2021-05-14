@@ -3,9 +3,15 @@
 {% block body %}
 
 <h1>Dashboard</h1>
-<h4>Token: {{ token }}</h4>
+<h4 style="overflow-wrap: break-word;">Token: {{ token }}</h4>
+
+<div class="graphs">
+    <img class="graph" src={% url 'allsvg' %}>
+    <img class="graph" src={% url 'usersvg' %}>
+</div>
 
 <div class="articles" id='articles-dashboard'></div>
+
 
 <script>
 fetch('{% url 'api:news' %}?q={{ query }}', {
@@ -27,8 +33,10 @@ fetch('{% url 'api:news' %}?q={{ query }}', {
         let image = document.createElement('img')
         image.src = article['urlToImage']
         image.class = 'card-img-top'
+        image.style.minHeight = '200px'
+        image.style.height = '100%'
+        image.style.minWidth = '200px'
         image.style.width = '100%'
-        image.style.height = '15vw'
 
         let cardBody = document.createElement('div')
         cardBody.className = 'card-body'

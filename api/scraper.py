@@ -22,7 +22,7 @@ def newsSearch(query, timeRange='', excluding='', requiring=''):
         timeRange = '"' + requiring + '"'
     
     if not query:
-        return {'status': 'error', 'error': 'missing query', 'articlesFound': 0, 'articles': []}
+        return {'status': 'error', 'code': 400, 'error': 'missing query', 'articlesFound': 0, 'articles': []}
     url = f'https://news.google.com/search?q={str(query)} {requiring} {timeRange} {excluding}&hl=en-US&gl=US&ceid=US:en'
     print(url)
     try:
@@ -30,6 +30,7 @@ def newsSearch(query, timeRange='', excluding='', requiring=''):
     except:
         data = {}
         data['status'] = 'error'
+        data['code'] = 500
         data['error'] = 'network error server side.' \
                         'contact us on our support page to let' \
                         'us know about the issue'
@@ -42,6 +43,7 @@ def newsSearch(query, timeRange='', excluding='', requiring=''):
     except:
         data = {}
         data['status'] = 'error'
+        data['code'] = 500
         data['error'] = 'error collecting data'
         data['articlesFound'] = 0
         data['articles'] = []
@@ -50,6 +52,7 @@ def newsSearch(query, timeRange='', excluding='', requiring=''):
     data = {}
     data['status'] = 'searching'
     data['error'] = None
+    data['code'] = 200
     data['articlesFound'] = len(articles)
     numArticles = 0
     data['articles'] = []

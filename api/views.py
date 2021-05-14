@@ -4,12 +4,15 @@ from .scraper import newsSearch
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
+from .models import Queries
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.schemas import coreapi as coreapi_schema
 from rest_framework.schemas import ManualSchema, SchemaGenerator
 from rest_framework.compat import coreapi, coreschema
 from rest_framework import serializers
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
+import datetime
+
 # Create your views here.
 
 class ArticleSerializer(serializers.Serializer):
@@ -105,7 +108,19 @@ class News(GenericAPIView):
     )
     def get(self, request):
         # request.user for the user
-        return Response(newsSearch(query=request.GET.get('q', ''), 
+
+        response = newsSearch(query=request.GET.get('q', ''), 
             timeRange=request.GET.get('time', ''), 
             excluding=request.GET.get('exclude', ''), 
-            requiring=request.GET.get('require', '')))
+            requiring=request.GET.get('require', ''))
+        
+        if response['code'] == 200:
+            query = Queries(user=User.objects.get(username=request.user.username), 
+                query=request.GET.get('q'), 
+                excluding=request.GET.get('exclude', None),
+                required=request.GET.get('require', None),
+                time=datetime.datetime.now()
+            )
+            query.save()
+        
+        return Response(response, status=response['code'])
