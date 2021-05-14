@@ -10,16 +10,25 @@
 .card {
     margin: 10px;
     flex-grow: 0;
-    width: 30vw;
+    flex-basis: auto;
+    max-width: 30vw;
+    min-width: 200px;
 }
 
 .card-img-top {
-    max-height: 100px;
-    max-width: 100px;
-    object-fit: cover;
+    height: 200px !important;
+    object-fit: cover !important;
     /* object-fit:contain; */
 }
 
-/* .articles>* {
-    flex: 1 1 160px;
-} */
+.graph {
+    width: 40vw;
+    min-width: 300px;
+    margin: 10px;
+}
+
+.graphs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
