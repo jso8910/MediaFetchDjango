@@ -16,6 +16,7 @@ Jinja2==3.0.0
 jsonschema==3.2.0
 lxml==4.6.3
 MarkupSafe==2.0.0
+pygal==2.4.0
 pyrsistent==0.17.3
 pytz==2021.1
 PyYAML==5.4.1
