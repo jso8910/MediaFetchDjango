@@ -15,13 +15,16 @@ from bs4 import BeautifulSoup
 
 def newsSearch(query, timeRange='', excluding='', requiring=''):
     if excluding != '':
-        excluding = '-' + excluding
+        excluding = ' '.join(['-' + excludeWord for excludeWord in excluding.split()])
     elif timeRange != '':
         timeRange = 'when:' + timeRange
     elif requiring != '':
         timeRange = '"' + requiring + '"'
     
+    if not query:
+        return {'status': 'error', 'error': 'missing query', 'articlesFound': 0, 'articles': []}
     url = f'https://news.google.com/search?q={str(query)} {requiring} {timeRange} {excluding}&hl=en-US&gl=US&ceid=US:en'
+    print(url)
     try:
         page = requests.get(url)
     except:
